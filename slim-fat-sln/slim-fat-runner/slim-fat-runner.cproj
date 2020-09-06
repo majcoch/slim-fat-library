@@ -112,5 +112,12 @@
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\sd-card-driver\sd-card-driver.cproj">
+      <Name>sd-card-driver</Name>
+      <Project>{00eb8831-c401-4c63-a56d-ed2e89fd5742}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

@@ -109,5 +109,23 @@
 </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\sd-driver\commands.h">
+      <SubType>compile</SubType>
+      <Link>commands.h</Link>
+    </Compile>
+    <Compile Include="..\..\src\sd-driver\responses.h">
+      <SubType>compile</SubType>
+      <Link>responses.h</Link>
+    </Compile>
+    <Compile Include="..\..\src\sd-driver\sd_driver.c">
+      <SubType>compile</SubType>
+      <Link>sd_driver.c</Link>
+    </Compile>
+    <Compile Include="..\..\src\sd-driver\sd_driver.h">
+      <SubType>compile</SubType>
+      <Link>sd_driver.h</Link>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
