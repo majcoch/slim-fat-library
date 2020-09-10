@@ -69,6 +69,20 @@ inline sd_card_err sd_card_execute_CMD8(sd_card_t* sd) {
 	return err;
 }
 
+inline sd_card_err sd_card_execute_CMD17(sd_card_t* sd, const uint32_t sector) {
+	sd_card_err err = SD_SUCCESS;
+	
+	sd_card_send_command(sd, READ_SINGLE_BLOCK, sector, READ_SINGLE_BLOCK_CRC);
+	uint8_t r1 = sd_card_get_resp(sd, R1_RESP_LEN, NULL);
+	if(!(r1 & R1_RESP_MASK)){
+		if( r1 & ADDRESS_ERROR ) err = SD_READ_ADDR_ERR;
+		else if ( r1 & PARAMETER_ERROR ) err = SD_READ_OUT_RNG;
+	}
+	else err = SD_TIMEOUT;
+	
+	return err;
+}
+
 inline sd_card_err sd_card_execute_CMD58(sd_card_t* sd, uint8_t* ocr) {
 	sd_card_err err = SD_SUCCESS;
 	
@@ -100,6 +114,20 @@ inline sd_card_err sd_card_execute_ACMD41(sd_card_t* sd){
 	return err;
 }
 
+inline sd_card_err sd_card_await_read(sd_card_t* sd){
+	sd_card_err err = SD_SUCCESS;
+	
+	uint8_t flag = 1;
+	for (uint8_t timeout = 0; timeout < ACCESS_TIMEOUT && flag; timeout++) {
+		uint8_t resp = sd_card_tranfer_byte(sd, DUMMY_BYTE);
+		if( BLOCK_START_TOKEN == resp ) flag = 0;
+	}
+	if(flag) err = SD_READ_FAIL;
+	
+	return err;
+}
+
+
 
 sd_card_err sd_card_init(sd_card_t* sd) {
 	sd_card_err err = SD_SUCCESS;
@@ -130,6 +158,31 @@ sd_card_err sd_card_init(sd_card_t* sd) {
 				else if(sd_ocr[0] & CARD_CAPACITY)
 					sd->type = SD_VER_2_0_HC;
 			}
+		}
+	}
+	
+	sd_card_set_enable(sd, SD_DISABLE);
+	return err;
+}
+
+sd_card_err sd_card_read(sd_card_t* sd, const uint32_t sector, uint8_t* buffer) {
+	sd_card_err err = SD_SUCCESS;
+	
+	uint32_t sector_to_read = sector;
+	if(sd->type != SD_VER_2_0_HC) sector_to_read <<= 9;
+	
+	sd_card_set_enable(sd, SD_ENABLE);
+	err = sd_card_execute_CMD17(sd, sector_to_read);
+	if(SD_SUCCESS == err) {
+		// Wait for data start token
+		err = sd_card_await_read(sd);
+		if(SD_SUCCESS == err) {
+			// Get sector data
+			for(uint16_t count = 0; count < SECTOR_SIZE; count++)
+			buffer[count] = sd_card_tranfer_byte(sd, DUMMY_BYTE);
+			// Get CRC
+			sd_card_tranfer_byte(sd, DUMMY_BYTE);
+			sd_card_tranfer_byte(sd, DUMMY_BYTE);
 		}
 	}
 	

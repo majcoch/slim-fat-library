@@ -32,5 +32,7 @@
 #define CHECK_PATTER		0xAA
 #define ACCEPT_VOL_RNG		0b0001
 
+#define BLOCK_START_TOKEN		0xFE
+
 
 #endif /* RESPONSES_H_ */

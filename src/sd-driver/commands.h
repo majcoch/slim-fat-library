@@ -30,5 +30,8 @@
 #define SD_SEND_OP_COND_ARG		0x40000000	// SD HC accepted
 #define SD_SEND_OP_COND_CRC		0x00
 
+#define READ_SINGLE_BLOCK		0x51
+#define READ_SINGLE_BLOCK_CRC	0x00
+
 
 #endif /* COMMANDS_H_ */

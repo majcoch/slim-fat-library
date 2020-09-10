@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#define SECTOR_SIZE 512
+
 /* ---------- SD CARD CHIP SELECT ---------- */
 #define SD_ENABLE	0
 #define SD_DISABLE	1
@@ -19,6 +21,7 @@
 #define RESET_TIMEOUT	10
 #define INIT_TIMEOUT	200
 #define COMMAND_TIMEOUT	100
+#define ACCESS_TIMEOUT	200
 
 typedef enum {
 	SD_SUCCESS,
@@ -26,6 +29,9 @@ typedef enum {
 	SD_RESET_FAIL,		// When card fails to go idle state - card may not be present in slot	
 	SD_INIT_FAIL,		// When card was unable to initialize
 	SD_UNSUPPORTED,		// When card cannot be recognized or operating conditions are not met
+	SD_READ_FAIL,		// When card was unable to send data token and start transmitting data
+	SD_READ_ADDR_ERR,	// Reading from unaligned sector address
+	SD_READ_OUT_RNG,	// Reading outside of card address range
 }sd_card_err;
 
 typedef enum{
