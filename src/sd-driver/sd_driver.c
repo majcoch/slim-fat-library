@@ -69,6 +69,19 @@ inline sd_card_err sd_card_execute_CMD8(sd_card_t* sd) {
 	return err;
 }
 
+inline sd_card_err sd_card_execute_CMD13(sd_card_t* sd){
+	sd_card_err err = SD_SUCCESS;
+	
+	sd_card_send_command(sd, SEND_STATUS, SEND_STATUS_ARG, SEND_STATUS_CRC);
+	uint8_t r2 = 0;
+	if( READY == sd_card_get_resp(sd, R2_RESP_LEN, &r2) ) {
+		if( READY != r2 ) err = SD_WRITE_FAIL;
+	}
+	else err = SD_TIMEOUT;
+	
+	return err;
+}
+
 inline sd_card_err sd_card_execute_CMD17(sd_card_t* sd, const uint32_t sector) {
 	sd_card_err err = SD_SUCCESS;
 	
@@ -77,6 +90,20 @@ inline sd_card_err sd_card_execute_CMD17(sd_card_t* sd, const uint32_t sector) {
 	if(!(r1 & R1_RESP_MASK)){
 		if( r1 & ADDRESS_ERROR ) err = SD_READ_ADDR_ERR;
 		else if ( r1 & PARAMETER_ERROR ) err = SD_READ_OUT_RNG;
+	}
+	else err = SD_TIMEOUT;
+	
+	return err;
+}
+
+inline sd_card_err sd_card_execute_CMD24(sd_card_t* sd, const uint32_t sector){
+	sd_card_err err = SD_SUCCESS;
+	
+	sd_card_send_command(sd, WRITE_BLOCK, sector, WRITE_BLOCK_CRC);
+	uint8_t r1 = sd_card_get_resp(sd, R1_RESP_LEN, NULL);
+	if(!(r1 & R1_RESP_MASK)){
+		if( r1 & ADDRESS_ERROR ) err = SD_WRITE_ADDR_ERR;
+		else if ( r1 & PARAMETER_ERROR ) err = SD_WRITE_OUT_RNG;
 	}
 	else err = SD_TIMEOUT;
 	
@@ -123,6 +150,20 @@ inline sd_card_err sd_card_await_read(sd_card_t* sd){
 		if( BLOCK_START_TOKEN == resp ) flag = 0;
 	}
 	if(flag) err = SD_READ_FAIL;
+	
+	return err;
+}
+
+inline sd_card_err sd_card_await_write(sd_card_t* sd){
+	sd_card_err err = SD_SUCCESS;
+	
+	uint8_t data_token = sd_card_get_resp(sd, R1_RESP_LEN, NULL);
+	if( DATA_ACCEPTED == (data_token & DATA_RESP_TOKEN) ){
+		// Wait for internal operation to finish
+		while( 0x00 == sd_card_tranfer_byte(sd, DUMMY_BYTE));
+		// Verify write
+		err = sd_card_execute_CMD13(sd);
+	}
 	
 	return err;
 }
@@ -184,6 +225,33 @@ sd_card_err sd_card_read(sd_card_t* sd, const uint32_t sector, uint8_t* buffer) 
 			sd_card_tranfer_byte(sd, DUMMY_BYTE);
 			sd_card_tranfer_byte(sd, DUMMY_BYTE);
 		}
+	}
+	
+	sd_card_set_enable(sd, SD_DISABLE);
+	return err;
+}
+
+sd_card_err sd_card_write(sd_card_t* sd, const uint32_t sector, const uint8_t* buffer) {
+	sd_card_err err = SD_SUCCESS;
+	
+	uint32_t sector_to_write = sector;
+	if(sd->type != SD_VER_2_0_HC) sector_to_write <<= 9;
+	
+	sd_card_set_enable(sd, SD_ENABLE);
+	err = sd_card_execute_CMD24(sd, sector_to_write);
+	if(SD_SUCCESS == err) {
+		// Set start token
+		sd_card_tranfer_byte(sd, BLOCK_START_TOKEN);
+		
+		// Transmit whole sector
+		for(uint16_t count = 0; count < SECTOR_SIZE; count++)
+		sd_card_tranfer_byte(sd, buffer[count]);
+		// Send CRC
+		sd_card_tranfer_byte(sd, DUMMY_BYTE);
+		sd_card_tranfer_byte(sd, DUMMY_BYTE);
+		
+		// validate write operation
+		err = sd_card_await_write(sd);
 	}
 	
 	sd_card_set_enable(sd, SD_DISABLE);

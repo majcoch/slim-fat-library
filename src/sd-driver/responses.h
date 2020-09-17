@@ -32,7 +32,12 @@
 #define CHECK_PATTER		0xAA
 #define ACCEPT_VOL_RNG		0b0001
 
-#define BLOCK_START_TOKEN		0xFE
+#define BLOCK_START_TOKEN	0xFE
+
+#define DATA_RESP_TOKEN		0x0E
+#define DATA_ACCEPTED		0x04
+#define DATA_CRC_ERR		0x0A
+#define DATA_WRITE_ERR		0x0C
 
 
 #endif /* RESPONSES_H_ */

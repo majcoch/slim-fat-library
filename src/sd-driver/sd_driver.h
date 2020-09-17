@@ -32,6 +32,9 @@ typedef enum {
 	SD_READ_FAIL,		// When card was unable to send data token and start transmitting data
 	SD_READ_ADDR_ERR,	// Reading from unaligned sector address
 	SD_READ_OUT_RNG,	// Reading outside of card address range
+	SD_WRITE_FAIL,		// When card was unable to store data in memory array
+	SD_WRITE_ADDR_ERR,	// Writing to unaligned sector address
+	SD_WRITE_OUT_RNG,	// Writing outside of card address range
 }sd_card_err;
 
 typedef enum{
