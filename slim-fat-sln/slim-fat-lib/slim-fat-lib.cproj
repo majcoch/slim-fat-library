@@ -109,5 +109,23 @@
 </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="slimfat" />
+    <Folder Include="slimfat\storage" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\slimfat\slimfaterr.h">
+      <SubType>compile</SubType>
+      <Link>slimfat\slimfaterr.h</Link>
+    </Compile>
+    <Compile Include="..\..\src\slimfat\storage\storage.c">
+      <SubType>compile</SubType>
+      <Link>slimfat\storage\storage.c</Link>
+    </Compile>
+    <Compile Include="..\..\src\slimfat\storage\storage.h">
+      <SubType>compile</SubType>
+      <Link>slimfat\storage\storage.h</Link>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
