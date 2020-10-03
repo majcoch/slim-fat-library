@@ -10,7 +10,10 @@
 #define SLIMFATERR_H_
 
 typedef enum {
-	FS_SUCCESS
+	FS_SUCCESS,
+	FS_READ_FAIL,
+	FS_WRITE_FAIL,
+	FS_SIG_MISMATCH
 } fs_error;
 
 #endif /* SLIMFATERR_H_ */
