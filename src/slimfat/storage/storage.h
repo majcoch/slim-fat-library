@@ -29,6 +29,7 @@ typedef struct {
 fs_error find_partition(fs_storage_device* device, const uint8_t partition_number, uint32_t* sector);
 fs_error read_buffered_sector(fs_storage_device* device, const uint32_t sector);
 fs_error write_buffered_sector(fs_storage_device* device, const uint32_t sector);
-
+uint8_t* get_raw_buffer(fs_storage_device* device);
+void set_pending_write(fs_storage_device* device);
 
 #endif /* STORAGE_H_ */

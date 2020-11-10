@@ -14,9 +14,25 @@
 #include "../storage/storage.h"
 
 typedef struct fs_fat32_partition {
+	// Hardware device on which partition exists
+	fs_storage_device* device;
+	// FAT32 partition data
+	uint16_t bytes_per_sector;
+	uint8_t	 sectors_per_cluster;
+	uint32_t root_cluster;
+	uint32_t sectors_pre_fat;
+	uint32_t fat_start_sector;
+	uint32_t data_start_sector;
 } fs_partition_t;
 
 typedef struct fat32_entry {
+	// Basic file info
+	uint8_t  attributes;
+	uint32_t file_size;
+	uint32_t starting_cluster;
+	// File access variables
+	uint32_t root_dir_cluster;
+	uint16_t root_dir_offset;
 } fat_entry_t;
 
 /* Partition operation */

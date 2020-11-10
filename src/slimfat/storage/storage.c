@@ -53,3 +53,11 @@ fs_error write_buffered_sector(fs_storage_device* device, const uint32_t sector)
 
 	return err;
 }
+
+uint8_t* get_raw_buffer(fs_storage_device* device) {
+	return device->buffer;
+}
+
+void set_pending_write(fs_storage_device* device) {
+	device->status = 1;
+}
