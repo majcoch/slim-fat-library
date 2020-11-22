@@ -112,6 +112,7 @@
   <ItemGroup>
     <Folder Include="slimfat" />
     <Folder Include="slimfat\fat32" />
+    <Folder Include="slimfat\fileio" />
     <Folder Include="slimfat\storage" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +123,14 @@
     <Compile Include="..\..\src\slimfat\fat32\fat32.h">
       <SubType>compile</SubType>
       <Link>slimfat\fat32\fat32.h</Link>
+    </Compile>
+    <Compile Include="slimfat\fileio\fileio.c">
+      <SubType>compile</SubType>
+      <Link>slimfat\fileio\standardio.c</Link>
+    </Compile>
+    <Compile Include="slimfat\fileio\fileio.h">
+      <SubType>compile</SubType>
+      <Link>slimfat\fileio\standardio.h</Link>
     </Compile>
     <Compile Include="..\..\src\slimfat\slimfaterr.h">
       <SubType>compile</SubType>
