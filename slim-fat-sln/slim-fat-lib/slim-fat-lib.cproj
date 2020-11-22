@@ -124,13 +124,13 @@
       <SubType>compile</SubType>
       <Link>slimfat\fat32\fat32.h</Link>
     </Compile>
-    <Compile Include="slimfat\fileio\fileio.c">
+    <Compile Include="..\..\src\slimfat\fileio\fileio.c">
       <SubType>compile</SubType>
-      <Link>slimfat\fileio\standardio.c</Link>
+      <Link>slimfat\fileio\fileio.c</Link>
     </Compile>
-    <Compile Include="slimfat\fileio\fileio.h">
+    <Compile Include="..\..\src\slimfat\fileio\fileio.h">
       <SubType>compile</SubType>
-      <Link>slimfat\fileio\standardio.h</Link>
+      <Link>slimfat\fileio\fileio.h</Link>
     </Compile>
     <Compile Include="..\..\src\slimfat\slimfaterr.h">
       <SubType>compile</SubType>
