@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include "../slimfaterr.h"
 
+#define SECTOR_SIZE 512
+
 typedef struct {
 	/* Storage media object */
 	void* disk;

@@ -12,8 +12,6 @@
 
 #define ENTRY_SIZE  32
 
-#define SECTOR_SIZE 512
-
 #define FS_TYPE_SIG "FAT32"
 
 #define FAT_32_EMPTY_CLUSTER(cluster)
