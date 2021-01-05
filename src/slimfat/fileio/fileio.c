@@ -3,6 +3,9 @@
 #include <stddef.h>
 #include <string.h>
 
+#define EOL_CR_CHAR	'\r'
+#define EOL_LF_CHAR	'\n'
+
 uint8_t end_of_cluster(fs_file_t* file) {
 	uint32_t left = file->current_offset % (file->partition->sectors_per_cluster * SECTOR_SIZE);
 	return (left || !file->current_offset); // zero on success
@@ -25,6 +28,30 @@ fs_error read_file_buffer(fs_file_t* file) {
 uint8_t* get_file_buffer(fs_file_t* file) {
 	return get_raw_buffer(file->partition->device);
 }
+
+uint8_t find_eol_sequence(const  uint8_t* buff, uint16_t* count) {
+	uint8_t match = 0;
+
+	static uint8_t partial_match;
+	uint16_t res = 0;
+	for (uint16_t i = 0; (i < *count) && !match; i++) {
+		if (buff[i] == EOL_CR_CHAR) {
+			partial_match = 1;
+		}
+		else if (buff[i] == EOL_LF_CHAR && partial_match == 1) {
+			partial_match = 2;
+			match = 1;
+		}
+		else {
+			partial_match = 0;
+		}
+		res++;
+	}
+	*count = res;
+
+	return match;
+}
+
 
 
 fs_error fs_mount(fs_partition_t* partition, const uint8_t partition_number) {
@@ -85,6 +112,41 @@ fs_error fs_fopen(fs_file_t* file, const char* file_name, const fs_mode mode) {
 	return err;
 }
 
+uint16_t fs_fread(fs_file_t* file, uint8_t* ptr, const uint16_t count) {
+	uint8_t err = FS_SUCCESS;
+
+	if (READ != file->mode) {
+		err = FS_FILE_ACCES_FAIL;
+	}
+
+	uint16_t bytes_left = count;
+	uint32_t file_left = get_file_left_bytes(file);
+	while (FS_SUCCESS == err && bytes_left && file_left) {
+		if (!end_of_cluster(file)) {
+			err = fat32_find_next_cluster(file->partition, &file->current_cluster);
+		}
+		if (FS_SUCCESS == err) {
+			err = read_file_buffer(file);
+			if (FS_SUCCESS == err) {
+				// Calculate bytes to copy from current sector
+				uint16_t sector_offset = get_offset_in_sector(file);
+				uint16_t bytes_to_copy = SECTOR_SIZE - sector_offset;
+				if (bytes_to_copy > file_left) bytes_to_copy = file_left;
+				if (bytes_to_copy > bytes_left) bytes_to_copy = bytes_left;
+
+				uint8_t* buffer = get_file_buffer(file);
+				memcpy(&ptr[(count - bytes_left)], &buffer[sector_offset], bytes_to_copy);
+
+				bytes_left -= bytes_to_copy;
+				file_left -= bytes_to_copy;
+				file->current_offset += bytes_to_copy;
+			}
+		}
+	}
+
+	return (count - bytes_left);
+}
+
 uint8_t fs_fgetc(fs_file_t* file) {
 	fs_error err = FS_SUCCESS;
 	uint8_t result = 0; // This should be EOF character
@@ -104,5 +166,38 @@ uint8_t fs_fgetc(fs_file_t* file) {
 	}
 
 	return result;
+}
+
+uint8_t* fs_fgets(fs_file_t* file, uint8_t* str, const uint16_t num) {
+	fs_error err = FS_SUCCESS;
+	uint8_t end_of_line = 0;
+
+	uint16_t result_offset = 0;
+	uint32_t file_left = get_file_left_bytes(file);
+	while (FS_SUCCESS == err && !end_of_line && 0 != file_left) {
+		if ( !end_of_cluster(file) ){
+			err = fat32_find_next_cluster(file->partition, &file->current_cluster);
+		}
+		if (FS_SUCCESS == err) {
+			err = read_file_buffer(file);
+			if (FS_SUCCESS == err) {
+				uint16_t sector_offset = get_offset_in_sector(file);
+				uint16_t bytes_to_copy = SECTOR_SIZE - sector_offset;
+				uint16_t result_left = num - result_offset;
+				if (bytes_to_copy > file_left) bytes_to_copy = file_left;
+				if (bytes_to_copy > result_left) bytes_to_copy = result_left;
+
+				uint8_t* buffer = get_file_buffer(file);
+				end_of_line = find_eol_sequence(&buffer[sector_offset], &bytes_to_copy);
+				memcpy(&str[result_offset], &buffer[sector_offset], bytes_to_copy);
+
+				file_left -= bytes_to_copy;
+				result_offset += bytes_to_copy;
+				file->current_offset += bytes_to_copy;
+			}
+		}
+	}
+
+	return end_of_line ? str : NULL;
 }
 

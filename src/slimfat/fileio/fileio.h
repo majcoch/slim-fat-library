@@ -57,7 +57,7 @@ uint16_t fs_fwrite(fs_file_t* file, const uint8_t* buffer, const uint16_t count)
 
 /* Character input/output */
 uint8_t  fs_fgetc(fs_file_t* file);
-uint8_t* fs_fgets(fs_file_t* file, uint8_t* str, const uint16_t count);
+uint8_t* fs_fgets(fs_file_t* file, uint8_t* str, const uint16_t num);
 fs_error fs_fputc(fs_file_t* file, const uint8_t character);
 fs_error fs_fputs(fs_file_t* file, const uint8_t* str);
 
