@@ -201,3 +201,46 @@ uint8_t* fs_fgets(fs_file_t* file, uint8_t* str, const uint16_t num) {
 	return end_of_line ? str : NULL;
 }
 
+fs_error fs_fseek(fs_file_t* file, const uint32_t offset, const fs_seek origin) {
+	fs_error err = FS_SUCCESS;
+
+	uint32_t new_offset = 0;
+	switch (origin) {
+		case FS_SEEK_SET:
+			new_offset = offset;
+		break;
+		
+		case FS_SEEK_CUR:
+			new_offset = file->current_offset + offset;
+		break;
+		
+		case FS_SEEK_END:
+			new_offset = file->entry.file_size - offset;
+		break;
+	}
+
+	if (new_offset <= file->entry.file_size) {
+		// Prevent loading cluster ahead of reading -> load cluster only if read is requested
+		uint8_t cluster_number = new_offset / (file->partition->sectors_per_cluster * SECTOR_SIZE);
+		if (cluster_number) cluster_number -= !(new_offset % (file->partition->sectors_per_cluster * SECTOR_SIZE));
+
+		uint32_t new_cluster = file->entry.starting_cluster;
+		for (uint8_t i = 0; i < cluster_number && !err; i++) {
+			err = fat32_find_next_cluster(file->partition, &new_cluster);
+		}
+		if (FS_SUCCESS == err) {
+			file->current_offset = new_offset;
+			file->current_cluster = new_cluster;
+		}
+	}
+	else {
+		err = FS_INVALID_OFFSET;
+	}
+
+	return err;
+}
+
+uint32_t fs_ftell(const fs_file_t* file) {
+	return file->current_offset;
+}
+
