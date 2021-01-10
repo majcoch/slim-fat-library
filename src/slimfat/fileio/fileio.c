@@ -244,3 +244,7 @@ uint32_t fs_ftell(const fs_file_t* file) {
 	return file->current_offset;
 }
 
+uint8_t fs_feof(const fs_file_t* file) {
+	return (0 == get_file_left_bytes(file));
+}
+
