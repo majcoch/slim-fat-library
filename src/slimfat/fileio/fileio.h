@@ -53,7 +53,7 @@ fs_error fs_fflush(fs_file_t* file);
 
 /* Direct input/output */
 uint16_t fs_fread(fs_file_t* file, uint8_t* ptr, const uint16_t count);
-uint16_t fs_fwrite(fs_file_t* file, const uint8_t* buffer, const uint16_t count);
+uint16_t fs_fwrite(fs_file_t* file, const uint8_t* ptr, const uint16_t count);
 
 /* Character input/output */
 uint8_t  fs_fgetc(fs_file_t* file);

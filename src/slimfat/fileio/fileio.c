@@ -147,6 +147,48 @@ uint16_t fs_fread(fs_file_t* file, uint8_t* ptr, const uint16_t count) {
 	return (count - bytes_left);
 }
 
+uint16_t fs_fwrite(fs_file_t* file, const uint8_t* ptr, const uint16_t count){
+	uint8_t err = FS_SUCCESS;
+	uint16_t bytes_left = count;
+
+	if (READ == file->mode) {
+		err = FS_FILE_ACCES_FAIL;
+	}
+
+	// Allocate first cluster for empty file
+	if (0 == file->entry.file_size) {
+		fat32_alloc_new_cluster(file->partition, &file->entry.starting_cluster);
+		file->current_cluster = file->entry.starting_cluster;
+	}
+
+	while (FS_SUCCESS == err && bytes_left) {
+		if (!end_of_cluster(file)) {
+			fat32_alloc_new_cluster(file->partition, &file->current_cluster);
+		}
+		if (FS_SUCCESS == err) {
+			err = read_file_buffer(file);
+			if (FS_SUCCESS == err) {
+				set_pending_write(file->partition->device);
+
+				// Calculate bytes to copy to current sector
+				uint16_t sector_offset = get_offset_in_sector(file);
+				uint16_t bytes_to_copy = SECTOR_SIZE - sector_offset;
+				if (bytes_to_copy > bytes_left) bytes_to_copy = bytes_left;
+
+				uint8_t* buffer = get_file_buffer(file);
+				memcpy(&buffer[sector_offset], &ptr[(count - bytes_left)], bytes_to_copy);
+
+				bytes_left -= bytes_to_copy;
+				file->entry.file_size += bytes_to_copy;
+				file->current_offset += bytes_to_copy;
+			}
+			
+		}
+	}
+
+	return (count - bytes_left);
+}
+
 uint8_t fs_fgetc(fs_file_t* file) {
 	fs_error err = FS_SUCCESS;
 	uint8_t result = 0; // This should be EOF character
@@ -201,6 +243,78 @@ uint8_t* fs_fgets(fs_file_t* file, uint8_t* str, const uint16_t num) {
 	return end_of_line ? str : NULL;
 }
 
+fs_error fs_fputc(fs_file_t* file, const uint8_t character) {
+	uint8_t err = FS_SUCCESS;
+
+	// Allocate first cluster for empty file
+	if (0 == file->entry.file_size) {
+		fat32_alloc_new_cluster(file->partition, &file->entry.starting_cluster);
+		file->current_cluster = file->entry.starting_cluster;
+	}
+
+	// Allocate next cluster for more file data
+	if (!end_of_cluster(file)) {
+		fat32_alloc_new_cluster(file->partition, &file->current_cluster);
+	}
+
+	err = read_file_buffer(file);   // Make sure internal buffer is valid
+	if (FS_SUCCESS == err) {
+		set_pending_write(file->partition->device);
+
+		uint16_t sector_offset = get_offset_in_sector(file);
+		uint8_t* buffer = get_file_buffer(file);
+		if (0 == sector_offset) {
+			memset(buffer, 0, SECTOR_SIZE);
+		}
+		buffer[sector_offset] = character;
+
+		file->current_offset++;
+		file->entry.file_size++;
+	}
+	
+
+	return err;
+}
+
+fs_error fs_fputs(fs_file_t* file, const uint8_t* str) {
+	fs_error err = FS_SUCCESS;
+	uint16_t str_len = strlen(str);
+	uint16_t bytes_left = str_len;
+
+	// Allocate first cluster for empty file
+	if (0 == file->entry.file_size) {
+		fat32_alloc_new_cluster(file->partition, &file->entry.starting_cluster);
+		file->current_cluster = file->entry.starting_cluster;
+	}
+
+	while (FS_SUCCESS == err && bytes_left) {
+		if (!end_of_cluster(file)) {
+			fat32_alloc_new_cluster(file->partition, &file->current_cluster);
+		}
+		if (FS_SUCCESS == err) {
+			err = read_file_buffer(file);
+			if (FS_SUCCESS == err) {
+				set_pending_write(file->partition->device);
+
+				// Calculate bytes to copy to current sector
+				uint16_t sector_offset = get_offset_in_sector(file);
+				uint16_t bytes_to_copy = SECTOR_SIZE - sector_offset;
+				if (bytes_to_copy > bytes_left) bytes_to_copy = bytes_left;
+
+				uint8_t* buffer = get_file_buffer(file);
+				memcpy(&buffer[sector_offset], &str[(str_len - bytes_left)], bytes_to_copy);
+
+				bytes_left -= bytes_to_copy;
+				file->entry.file_size += bytes_to_copy;
+				file->current_offset += bytes_to_copy;
+			}
+
+		}
+	}
+
+	return err;
+}
+
 fs_error fs_fseek(fs_file_t* file, const uint32_t offset, const fs_seek origin) {
 	fs_error err = FS_SUCCESS;
 
@@ -247,4 +361,3 @@ uint32_t fs_ftell(const fs_file_t* file) {
 uint8_t fs_feof(const fs_file_t* file) {
 	return (0 == get_file_left_bytes(file));
 }
-
