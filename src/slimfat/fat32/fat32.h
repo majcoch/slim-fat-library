@@ -35,6 +35,8 @@ typedef struct fat32_entry {
 	uint16_t root_dir_offset;
 } fat_entry_t;
 
+#define GET_PART_HANDLE(dev) {.device = &dev}
+
 /* Partition operation */
 fs_error fat32_mount_partition(fs_partition_t* partition, const uint32_t start_sector);
 

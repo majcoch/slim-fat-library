@@ -86,6 +86,7 @@
   <avrgcc.compiler.directories.IncludePaths>
     <ListValues>
       <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.6.364\include\</Value>
+      <Value>../../../src</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcc.compiler.optimization.level>
@@ -111,6 +112,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="spi\spi_master.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi\spi_master.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\sd-card-driver\sd-card-driver.cproj">
@@ -118,6 +125,14 @@
       <Project>{00eb8831-c401-4c63-a56d-ed2e89fd5742}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\slim-fat-lib\slim-fat-lib.cproj">
+      <Name>slim-fat-lib</Name>
+      <Project>{463e6b59-0cca-49b2-9e5d-773df16c2cd5}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="spi" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

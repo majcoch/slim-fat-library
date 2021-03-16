@@ -28,6 +28,8 @@ typedef struct {
 	uint8_t(*write_sector)(void*, const uint32_t, const uint8_t*);
 } fs_storage_device;
 
+#define GET_DEV_HANDLE(buff, dev, read, write) {.disk = dev, .status = 0, .buffer = buff,  .read_sector = read, .write_sector = write }
+
 fs_error find_partition(fs_storage_device* device, const uint8_t partition_number, uint32_t* sector);
 fs_error read_buffered_sector(fs_storage_device* device, const uint32_t sector);
 fs_error write_buffered_sector(fs_storage_device* device, const uint32_t sector);

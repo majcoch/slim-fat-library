@@ -43,6 +43,8 @@ typedef struct fs_generic_file {
 	uint32_t	current_offset;
 } fs_file_t;
 
+#define GET_FILE_HANDLE(part) {.partition = &part}
+
 /* Partition operations */
 fs_error fs_mount(fs_partition_t* partition, const uint8_t partition_number);
 

@@ -112,6 +112,26 @@ fs_error fs_fopen(fs_file_t* file, const char* file_name, const fs_mode mode) {
 	return err;
 }
 
+fs_error fs_fclose(fs_file_t* file) {
+	uint8_t err = FS_SUCCESS;
+
+	if (READ != file->mode) {
+		err = fat32_update_entry(file->partition, &file->entry);
+	}
+
+	return err;
+}
+
+fs_error fs_fflush(fs_file_t* file) {
+	uint8_t err = FS_SUCCESS;
+
+	if (READ != file->mode) {
+		err = fat32_update_entry(file->partition, &file->entry);
+	}
+
+	return err;
+}
+
 uint16_t fs_fread(fs_file_t* file, uint8_t* ptr, const uint16_t count) {
 	uint8_t err = FS_SUCCESS;
 

@@ -50,6 +50,8 @@ typedef struct {
 	void (*spi_chip_select)(uint8_t);
 } sd_card_t;
 
+#define GET_SD_HANDLE(transfer_byte, chip_select) {.spi_transfer_byte = transfer_byte, .spi_chip_select = chip_select}
+
 sd_card_err	sd_card_init(sd_card_t* sd);
 sd_card_err	sd_card_read(sd_card_t* sd, const uint32_t sector, uint8_t* buffer);
 sd_card_err	sd_card_write(sd_card_t* sd, const uint32_t sector, const uint8_t* buffer);

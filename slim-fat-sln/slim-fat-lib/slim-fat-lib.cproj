@@ -132,6 +132,10 @@
       <SubType>compile</SubType>
       <Link>slimfat\fileio\fileio.h</Link>
     </Compile>
+    <Compile Include="..\..\src\slimfat\slimfat.h">
+      <SubType>compile</SubType>
+      <Link>slimfat\slimfat.h</Link>
+    </Compile>
     <Compile Include="..\..\src\slimfat\slimfaterr.h">
       <SubType>compile</SubType>
       <Link>slimfat\slimfaterr.h</Link>
