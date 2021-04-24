@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "slim-fat-runner", "slim-fat-runner\slim-fat-runner.cproj", "{DCE6C7E3-EE26-4D79-826B-08594B9AD897}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "slim-fat-lib", "slim-fat-lib\slim-fat-lib.cproj", "{463E6B59-0CCA-49B2-9E5D-773DF16C2CD5}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "sd-card-driver", "sd-card-driver\sd-card-driver.cproj", "{00EB8831-C401-4C63-A56D-ED2E89FD5742}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.ActiveCfg = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Debug|AVR.Build.0 = Debug|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.ActiveCfg = Release|AVR
+		{DCE6C7E3-EE26-4D79-826B-08594B9AD897}.Release|AVR.Build.0 = Release|AVR
+		{463E6B59-0CCA-49B2-9E5D-773DF16C2CD5}.Debug|AVR.ActiveCfg = Debug|AVR
+		{463E6B59-0CCA-49B2-9E5D-773DF16C2CD5}.Debug|AVR.Build.0 = Debug|AVR
+		{463E6B59-0CCA-49B2-9E5D-773DF16C2CD5}.Release|AVR.ActiveCfg = Release|AVR
+		{463E6B59-0CCA-49B2-9E5D-773DF16C2CD5}.Release|AVR.Build.0 = Release|AVR
+		{00EB8831-C401-4C63-A56D-ED2E89FD5742}.Debug|AVR.ActiveCfg = Debug|AVR
+		{00EB8831-C401-4C63-A56D-ED2E89FD5742}.Debug|AVR.Build.0 = Debug|AVR
+		{00EB8831-C401-4C63-A56D-ED2E89FD5742}.Release|AVR.ActiveCfg = Release|AVR
+		{00EB8831-C401-4C63-A56D-ED2E89FD5742}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
