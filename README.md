@@ -110,7 +110,7 @@ if (FS_SUCCESS == fs_fopen(&read_file, "read.txt", READ)) {
   fs_fclose(&read_file);
 }
 ```
-## File Writing
+### File Writing
 This example shows how to access file for writing. If file does not exist it will be created. If it existis its size will be truncted to zero and contents wiped.
 ```c
 fs_file_t write_file = GET_FILE_HANDLE(partition);
